@@ -1,84 +1,97 @@
 import React, { Component } from "react";
+import { collection, getDocs, addDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase"; 
 import AdminPanelControls from "./AdminPanelControls";
 import ProductsInfo from "./ProductsInfo";
-import { db } from "../../firebase";
-import classes from './AdminPanel.module.css';
+import classes from "./AdminPanel.module.css";
 
 class AdminPanel extends Component {
   state = {
     products: null,
     product: undefined,
-    productImageToKeep: ""
   };
 
-  addNewProduct = (name, price, discountedPrice, image) => {
-    db.collection("products")
-      .add({
+  addNewProduct = async (name, kcal, protein, carbs, fat) => {
+    try {
+      await addDoc(collection(db, "products"), {
         name: name,
-        price: +price,
-        discountedPrice: discountedPrice === "" ? null : +discountedPrice,
-        image: image,
-      })
-      .then(this.getProducts);
-  };
-
-  getProducts = () => {
-    db.collection("products")
-      .get()
-      .then((snapshot) => {
-        const updatedProducts = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          updatedProducts.push({ ...data, id: doc.id });
-        });
-
-        this.setState({ products: updatedProducts });
+        kcal: +kcal,
+        protein: +protein,
+        carbs: +carbs,
+        fat: +fat
       });
+      this.getProducts();
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
   };
 
-  deleteProduct = (id) => {
-    db.collection("products").doc(id).delete().then(this.getProducts);
+  getProducts = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "products"));
+      const updatedProducts = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+
+      this.setState({ products: updatedProducts });
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  deleteProduct = async (id) => {
+    try {
+      await deleteDoc(doc(db, "products", id));
+      this.getProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   editProduct = (product) => {
     this.setState({ product });
-    this.setState({productImageToKeep: product.image})
   };
 
-  updateProduct = (id, name, price, discountedPrice, image) => {
-    const updatedProduct = {
-      name: name,
-      price: +price,
-      discountedPrice: discountedPrice === "" ? null : +discountedPrice,
-    };
-  
-    // Check if a new image is being uploaded or if the image is being kept the same
-    if (image !== "" && image !== this.state.productImageToKeep) {
-      updatedProduct.image = image;
-    } else {
-      updatedProduct.image = this.state.productImageToKeep;
+  updateProduct = async (id, name, kcal, protein, carbs, fat) => {
+    try {
+      const updatedProduct = {
+        name: name,
+        kcal: +kcal,
+        protein: +protein,
+        carbs: +carbs,
+        fat: +fat
+      };
+
+      await setDoc(doc(db, "products", id), updatedProduct);
+      this.getProducts();
+      this.setState({ product: undefined });
+    } catch (error) {
+      console.error("Error updating product:", error);
     }
-  
-    db.collection("products")
-      .doc(id)
-      .set(updatedProduct)
-      .then(this.getProducts);
-    this.setState({ product: undefined });
   };
 
-  componentDidMount = () => {
+  componentDidMount() {
     this.getProducts();
-  };
+  }
 
   render() {
     return (
       <React.Fragment>
         <div className={classes.container}>
           <div className={classes.productsInfo}>
-          <ProductsInfo products={this.state.products} delete={this.deleteProduct} edit={this.editProduct} />
+            <ProductsInfo 
+              products={this.state.products} 
+              delete={this.deleteProduct} 
+              edit={this.editProduct} 
+            />
           </div>
           <div className={classes.controls}>
-          <AdminPanelControls add={this.addNewProduct} update={this.updateProduct} product={this.state.product} productImageToKeep={this.productImageToKeep}/>
+            <AdminPanelControls 
+              add={this.addNewProduct} 
+              update={this.updateProduct} 
+              product={this.state.product} 
+            />
           </div>
         </div>
       </React.Fragment>
@@ -87,3 +100,6 @@ class AdminPanel extends Component {
 }
 
 export default AdminPanel;
+
+
+// fix so that admin panel controls clear inputs after updating a product

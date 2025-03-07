@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { withStyles } from "@material-ui/core/styles";
 import { db } from "../../firebase";
 import Product from "./Product";
-import Cart from "../Cart/Cart";
+import Cart from "../MealPlan/MealPlan";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
-import { Dialog, DialogContent, DialogTitle, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
-
+import { Dialog, DialogContent, DialogTitle, TextField, Button} from "@material-ui/core";
+//import {FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
 import { connect } from "react-redux";
 
 const styles = (theme) => ({
@@ -72,7 +73,10 @@ const styles = (theme) => ({
   },
   searchContainer: {
     width: "90%",
-    display: "flex"
+    display: "flex",
+    "@media (max-width: 800px)": {
+      marginLeft: '40px'
+    }
   },
   sortContainer: {
     width: "10%",
@@ -82,12 +86,12 @@ const styles = (theme) => ({
   },
 });
 
-const Shop = (props) => {
+const ProductGalery = (props) => {
   const [products, setProducts] = useState(null);
   const [visibleProducts, setVisibleProducts] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [sortValue, setSortValue] = useState("");
+  //const [sortValue, setSortValue] = useState("");
 
   const toggleOpenCart = () => {
     setIsCartOpen(!isCartOpen);
@@ -124,86 +128,90 @@ const Shop = (props) => {
     }
   };
 
-  const onSortChange = (e) => {
-    setSortValue(e.target.value);
-  };
+  // const onSortChange = (e) => {
+  //   setSortValue(e.target.value);
+  // };
 
   useEffect(() => {
-    db.collection("products")
-      .get()
-      .then((snapshot) => {
-        const updatedProducts = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          updatedProducts.push({ ...data, id: doc.id });
-        });
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        const updatedProducts = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
         setProducts(updatedProducts);
         setVisibleProducts(updatedProducts);
-      });
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
 
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    let sortedProducts = [];
-    let copiedProducts = [];
+  //   let sortedProducts = [];
+  //   let copiedProducts = [];
 
-    switch (sortValue) {
-      case "latest":
-        sortedProducts = [...products];
-        setVisibleProducts(sortedProducts)
-        console.log("latest: ", sortedProducts);
-        break;
-      case "newest":
-        copiedProducts = [...products]
-        sortedProducts = copiedProducts.reverse();
-        setVisibleProducts(sortedProducts)
-        console.log("newest: ", sortedProducts);
-        break;
-      case "az":
-        copiedProducts = [...products]
-        sortedProducts = copiedProducts.sort((a, b) => (a.name > b.name) ? 1: -1);
-        setVisibleProducts(sortedProducts)
-        console.log("az: ", sortedProducts);
-        break;
-      case "za":
-        copiedProducts = [...products]
-        sortedProducts = copiedProducts.sort((a, b) => (b.name > a.name) ? 1: -1);
-        setVisibleProducts(sortedProducts)
-        console.log("za: ", sortedProducts);
-        break;
-      case "priceAsc":
-        copiedProducts = [...products]
-        const productsWithBuyingPriceArrayAsc = copiedProducts.map((obj) => ({
-          ...obj,
-          buyingPrice: obj.discountedPrice !== 0 ? obj.discountedPrice : obj.price,
-        }));
-         sortedProducts = productsWithBuyingPriceArrayAsc.sort((a, b) => {
-           return a.buyingPrice > b.buyingPrice ? 1: -1;
-         })
-        setVisibleProducts(sortedProducts)
-        console.log("priceAsc: ", sortedProducts);
-        break;
-      case "priceDesc":
-        copiedProducts = [...products]
-        const productsWithBuyingPriceArrayDesc = copiedProducts.map((obj) => ({
-          ...obj,
-          buyingPrice: obj.discountedPrice !== 0 ? obj.discountedPrice : obj.price,
-        }));
-         sortedProducts = productsWithBuyingPriceArrayDesc.sort((a, b) => {
-           return b.buyingPrice > a.buyingPrice ? 1: -1;
-         })
-        setVisibleProducts(sortedProducts)
-        console.log("priceDesc: ", sortedProducts);
-        break;
-      default:
-        sortedProducts = visibleProducts;
-        setVisibleProducts(sortedProducts)
-        console.log("default case");
-        break;
-    }
-  }, [sortValue])
+  //   switch (sortValue) {
+  //     case "latest":
+  //       sortedProducts = [...products];
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("latest: ", sortedProducts);
+  //       break;
+  //     case "newest":
+  //       copiedProducts = [...products]
+  //       sortedProducts = copiedProducts.reverse();
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("newest: ", sortedProducts);
+  //       break;
+  //     case "az":
+  //       copiedProducts = [...products]
+  //       sortedProducts = copiedProducts.sort((a, b) => (a.name > b.name) ? 1: -1);
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("az: ", sortedProducts);
+  //       break;
+  //     case "za":
+  //       copiedProducts = [...products]
+  //       sortedProducts = copiedProducts.sort((a, b) => (b.name > a.name) ? 1: -1);
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("za: ", sortedProducts);
+  //       break;
+  //     case "priceAsc":
+  //       copiedProducts = [...products]
+  //       const productsWithBuyingPriceArrayAsc = copiedProducts.map((obj) => ({
+  //         ...obj,
+  //         buyingPrice: obj.discountedPrice !== 0 ? obj.discountedPrice : obj.price,
+  //       }));
+  //        sortedProducts = productsWithBuyingPriceArrayAsc.sort((a, b) => {
+  //          return a.buyingPrice > b.buyingPrice ? 1: -1;
+  //        })
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("priceAsc: ", sortedProducts);
+  //       break;
+  //     case "priceDesc":
+  //       copiedProducts = [...products]
+  //       const productsWithBuyingPriceArrayDesc = copiedProducts.map((obj) => ({
+  //         ...obj,
+  //         buyingPrice: obj.discountedPrice !== 0 ? obj.discountedPrice : obj.price,
+  //       }));
+  //        sortedProducts = productsWithBuyingPriceArrayDesc.sort((a, b) => {
+  //          return b.buyingPrice > a.buyingPrice ? 1: -1;
+  //        })
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("priceDesc: ", sortedProducts);
+  //       break;
+  //     default:
+  //       sortedProducts = visibleProducts;
+  //       setVisibleProducts(sortedProducts)
+  //       console.log("default case");
+  //       break;
+  //   }
+  // }, [sortValue])
 
   const isCartVisible = props.cartProducts.length > 0;
 
@@ -231,7 +239,7 @@ const Shop = (props) => {
             SEARCH
           </Button>
         </div>
-        <div className={props.classes.sortContainer}>
+        {/* <div className={props.classes.sortContainer}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Sort</InputLabel>
             <Select
@@ -249,7 +257,7 @@ const Shop = (props) => {
               <MenuItem value={"priceDesc"}>Price descending</MenuItem>
             </Select>
           </FormControl>
-        </div>
+        </div> */}
       </div>
       <div className={props.classes.shopContainer}>
         <div className={props.classes.productsContainer}>
@@ -260,7 +268,7 @@ const Shop = (props) => {
         </div>
         <Dialog onClose={toggleOpenCart} aria-labelledby="customized-dialog-title" open={isCartOpen}>
           <DialogTitle align="center">
-            {props.cartProducts.length > 0 ? "Your cart" : "Your cart is empty"}
+            {props.cartProducts.length > 0 ? "Meal Plan" : "Your Meal Plan is empty"}
           </DialogTitle>
           <DialogContent dividers>
             <Cart products={props.cartProducts} clicked={toggleOpenCart} />
@@ -277,4 +285,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(withStyles(styles)(Shop));
+export default connect(mapStateToProps)(withStyles(styles)(ProductGalery));

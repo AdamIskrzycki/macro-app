@@ -12,6 +12,14 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.ADD:
       return { ...state, cartProducts: [...state.cartProducts, action.product] };
+    case actionTypes.ADD_HALF:
+      // halvedProduct = {}
+      // for (let key in action.product) {
+      //   console.log(key, action.product[key])
+      //   if(typeof(action.product[key]) == 'number') {
+      //     action.product[key] /= 2
+      //   }
+      return { ...state, cartProducts: [...state.cartProducts, action.product] };
     case actionTypes.REMOVE_ONE:
       const findIndex = state.cartProducts.findIndex((el) => el.id === action.productId);
       const splicedArray = [...state.cartProducts];

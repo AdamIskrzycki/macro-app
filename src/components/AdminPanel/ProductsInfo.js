@@ -35,9 +35,11 @@ const ProductsInfo = (props) => {
           <TableHead>
             <TableRow>
               <TableCell>Product</TableCell>
-              <TableCell align="center">Price ($) </TableCell>
-              <TableCell align="center">Discounted price ($)</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell align="center">Kcal</TableCell>
+              <TableCell align="center">Protein</TableCell>
+              <TableCell align="center">Carbs</TableCell>
+              <TableCell align="center">Fat</TableCell>
+              <TableCell align="center">Manage</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -47,8 +49,10 @@ const ProductsInfo = (props) => {
                   <TableCell component="th" scope="row">
                     {product.name}
                   </TableCell>
-                  <TableCell align="center">{product.price}</TableCell>
-                  <TableCell align="center">{product.discountedPrice ? product.discountedPrice : " - "}</TableCell>
+                  <TableCell align="center">{product.kcal}</TableCell>
+                  <TableCell align="center">{product.protein}</TableCell>
+                  <TableCell align="center">{product.carbs}</TableCell>
+                  <TableCell align="center">{product.fat}</TableCell>
                   <TableCell align="center">
                     <Tooltip title="Delete">
                       <DeleteIcon onClick={() => props.delete(product.id)} className={classes.icon} />

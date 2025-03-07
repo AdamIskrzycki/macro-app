@@ -1,21 +1,17 @@
-import firebase from "firebase/app";
-import "firebase/firestore";
-import "firebase/auth";
-import "firebase/storage"
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
-const apiKey = process.env.API_KEY
-
-var firebaseConfig = {
-  apiKey: apiKey, 
-  authDomain: "sklep-inz.firebaseapp.com",
-  databaseURL: "https://sklep-inz.firebaseio.com",
-  projectId: "sklep-inz",
-  storageBucket: "sklep-inz.appspot.com",
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_API_KEY,
+  //authDomain: "sklep-inz.firebaseapp.com",
+  databaseURL: "https://macro-app-73387.firebaseio.com",
+  projectId: "macro-app-73387",
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-export const db = firebase.firestore();
-export const storage = firebase.storage();
-
-export default firebase;
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);

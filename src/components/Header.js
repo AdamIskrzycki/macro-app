@@ -34,14 +34,8 @@ const Header = (props) => {
     <AppBar position="sticky">
       <Toolbar>
         <ShoppingBasketIcon className={classes.icon} />
-        <Typography variant="h6" color="inherit" noWrap className={classes.shop}>
-          Online shop
-        </Typography>
         <Button className={classes.button} variant="text" color="inherit" component={Link} to={"/"}>
           Home
-        </Button>
-        <Button className={classes.button} variant="text" color="inherit" component={Link} to={"/shop"}>
-          Shop
         </Button>
         <Button
           className={classes.button}
@@ -61,7 +55,7 @@ const Header = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    isAdmin: state.userId === "43PfXhmZ3aSah3Q32cB0A99vbiH2"
+    isAdmin: state.userId === process.env.REACT_APP_ADMIN_ID
   };
 }
 

@@ -4,7 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { Link } from "react-router-dom";
 
 import * as actionCreators from "../../store/actions";
 import { connect } from "react-redux";
@@ -46,13 +45,14 @@ const styles = () => ({
   },
 });
 
-class Cart extends Component {
+class MealPlan extends Component {
   render() {
     const { classes } = this.props;
-    const totalPrice = this.props.products.reduce(
-      (acc, product) => (product.discountedPrice ? acc + product.discountedPrice : acc + product.price),
-      0
-    );
+
+    const totalKcal = this.props.products.reduce((acc, product) => (acc + product.kcal), 0)
+    const totalProtein = this.props.products.reduce((acc, product) => (acc + product.protein), 0)
+    const totalCarbs = this.props.products.reduce((acc, product) => (acc + product.carbs), 0)
+    const totalFat = this.props.products.reduce((acc, product) => (acc + product.fat), 0)
 
     const grouped = groupBy(this.props.products, "id").sort((a, b) => a.name.localeCompare(b.name));
 
@@ -71,9 +71,15 @@ class Cart extends Component {
                 primary={
                   <Typography className={classes.cartProduct}>
                     {product.name +
-                      " | $" +
-                      (product.discountedPrice ? product.discountedPrice : product.price) +
-                      " | x" +
+                      " | " +
+                      product.kcal +
+                      " kcal | " +
+                      product.protein +
+                      "g protein | " +
+                      product.carbs +
+                      "g carbs | " +
+                      product.fat +
+                      "g fat | x" +
                       product.count}
                   </Typography>
                 }
@@ -88,25 +94,15 @@ class Cart extends Component {
           ))}
         </List>
         <Typography variant="h5" className={classes.totalPrice}>
-          Total price: {"$" + totalPrice.toFixed(2)}
+          Today's total macros: <br></br>
+          {totalKcal + " kcal"}<br></br>
+          {totalProtein + " g protein"}<br></br>
+          {totalCarbs + " g carbs"}<br></br>
+          {totalFat + " g fat"}
         </Typography>
         <Typography variant="h5" className={classes.totalAmount}>
-          {this.props.products ? "Products in cart: " + this.props.products.length : "Your cart is empty"}
+          {this.props.products ? "Products in a meal plan: " + this.props.products.length : "Your meal plan is empty"}
         </Typography>
-        <Tooltip arrow title="Sign in to make an order" open={this.props.isAuthenticated ? false : true}>
-          <div className={classes.buttonContainer}>
-            <Button
-              component={Link}
-              to={"/checkout"}
-              variant="contained"
-              color="primary"
-              className={classes.checkoutButton}
-              disabled={this.props.isAuthenticated ? false : true}
-            >
-              Order
-            </Button>
-          </div>
-        </Tooltip>
       </>
     );
 
@@ -114,7 +110,7 @@ class Cart extends Component {
       cart = (
         <>
           <Typography variant="h6" align="center">
-            Go back to shop to continue shopping!
+            Go back and add some products!
           </Typography>
           <Button variant="contained" color="primary" className={classes.checkoutButton} onClick={this.props.clicked}>
             Back
@@ -141,4 +137,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(Cart));
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(MealPlan));

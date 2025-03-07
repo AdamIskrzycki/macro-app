@@ -4,10 +4,6 @@ import { storage } from "../../firebase";
 import CloseIcon from '@material-ui/icons/Close';
 
 
-// FIX
-// when product is edited, their image automatically sets to a placeholder image - make it stay when you don't upload a new one and just edit price/name
-// problem probably lays in the handleImageAsFile function (try some conditionals) 
-
 const styles = (theme) => ({
   addButton: {
     fontWeight: "500",
@@ -59,8 +55,10 @@ class AdminPanelControls extends Component {
   state = {
     products: null,
     name: "",
-    price: "",
-    discountedPrice: "",
+    kcal: "",
+    protein: "",
+    carbs: "",
+    fat: "",
     isInEditMode: false,
     imageUrl: "",
   };
@@ -72,75 +70,64 @@ class AdminPanelControls extends Component {
     this.setState({ [name]: value });
   };
 
-  setPlaceholderImage = () => {
-    this.setState({imageUrl: '/images/nophoto.jpg'})
-  }
-
-  handleImageAsFile = (e) => {
-
-    const file = e.target.files[0];
-
-    if (file === undefined) return;
-
-    const uploadTask = storage.ref(`/images/${file.name}`).put(file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapShot) => {
-        console.log(snapShot);
-      },
-      (err) => {
-        console.log(err);
-      },
-      () => {
-        storage
-          .ref("images")
-          .child(file.name)
-          .getDownloadURL()
-          .then((fireBaseUrl) => {
-              console.log("imageUrl", this.state.imageUrl)
-              this.setState({ imageUrl: fireBaseUrl });
-          });
-      }
-    );
-  };
-
   onButtonClick = () => {
     if (this.state.isInEditMode) {
       this.props.update(
         this.state.productId,
         this.state.name,
-        this.state.price,
-        this.state.discountedPrice,
-        this.state.imageUrl
+        this.state.kcal,
+        this.state.protein,
+        this.state.carbs,
+        this.state.fat
       );
     } else {
-      this.props.add(this.state.name, this.state.price, this.state.discountedPrice, this.state.imageUrl);
+      this.props.add(this.state.name, this.state.kcal, this.state.protein, this.state.carbs, this.state.fat);
     }
-    this.setState({ name: "", price: "", discountedPrice: "", isInEditMode: false, imageUrl: "" });
+    console.log("clearing")
+    this.setState({ name: "", kcal: "", protein: "", carbs: "" , fat: "", isInEditMode: false});
     document.getElementById("focus").focus();
   };
 
 
-  static getDerivedStateFromProps(props, state) {
-    if ((props.product && !state.isInEditMode) || (props.product && state.productId !== props.product.id)) {
-      return {
-        name: props.product.name,
-        price: props.product.price,
-        discountedPrice: props.product.discountedPrice,
-        productId: props.product.id,
+  componentDidUpdate(prevProps) {
+    if (prevProps.product !== this.props.product && this.props.product) {
+      this.setState({
+        name: this.props.product.name,
+        kcal: this.props.product.kcal,
+        protein: this.props.product.protein,
+        carbs: this.props.product.carbs,
+        fat: this.props.product.fat,
+        productId: this.props.product.id,
         isInEditMode: true,
-      };
+      });
     }
-    return null;
   }
+
+  // static componentDidUpdate(props, state) {
+  //   if (
+  //     props.product && 
+  //     (!state.isInEditMode || state.productId !== props.product.id)
+  //   ) {
+  //     return {
+  //       name: props.product.name,
+  //       kcal: props.product.kcal,
+  //       protein: props.product.protein,
+  //       carbs: props.product.carbs,
+  //       fat: props.product.fat,
+  //       productId: props.product.id, // Store product ID
+  //       isInEditMode: true,
+  //     };
+  //   }
+    
+  //   return null;
+  // }
 
   render() {
     const { classes } = this.props;
     console.log(this.state);
 
     const inputProps = {
-      step: "0.01",
+      step: "1",
       min: "0",
     };
 
@@ -148,7 +135,7 @@ class AdminPanelControls extends Component {
       <React.Fragment>
         <Container className={classes.container}>
           <Typography variant="h5" align="center" color="textSecondary" paragraphvariant="h5" paragraph>
-            Specify product details below in order to add it to shop's assortment.
+            Add or update a product
           </Typography>
           <TextField
             value={this.state.name}
@@ -161,34 +148,47 @@ class AdminPanelControls extends Component {
             autoFocus
           />
           <TextField
-            value={this.state.price}
+            value={this.state.kcal}
             inputProps={inputProps}
             onChange={this.onInputChange}
-            name="price"
+            name="kcal"
             type="number"
-            label="Price"
+            label="Kcal"
             variant="outlined"
             className={classes.textField}
           />
           <TextField
-            value={this.state.discountedPrice}
+            value={this.state.protein}
             inputProps={inputProps}
             onChange={this.onInputChange}
-            name="discountedPrice"
+            name="protein"
             type="number"
-            label="Discounted price"
+            label="Protein"
             variant="outlined"
             className={classes.textField}
           />
-          <Box className={classes.box}>
-            <Typography variant="h6" color="textSecondary" className={classes.fileInput}>
-              <label for="imageUpload" className={classes.inputLabel}>
-                Add product image
-              </label>
-              <input id="imageUpload" type="file" onChange={this.handleImageAsFile} accept=".jpg, .jpeg, .png"></input>
-            </Typography>
-            <Button
-              disabled={this.state.name === "" || this.state.price === ""}
+          <TextField
+            value={this.state.carbs}
+            inputProps={inputProps}
+            onChange={this.onInputChange}
+            name="carbs"
+            type="number"
+            label="Carbs"
+            variant="outlined"
+            className={classes.textField}
+          />
+          <TextField
+            value={this.state.fat}
+            inputProps={inputProps}
+            onChange={this.onInputChange}
+            name="fat"
+            type="number"
+            label="Fat"
+            variant="outlined"
+            className={classes.textField}
+          />
+          <Button
+              disabled={this.state.name === "" || this.state.kcal === "" || this.state.protein === "" || this.state.carbs === "" || this.state.fat === ""}
               variant="contained"
               color="primary"
               className={classes.addButton}
@@ -196,9 +196,6 @@ class AdminPanelControls extends Component {
             >
               {this.state.isInEditMode ? "Save" : "Add"}
             </Button>
-            <img src={this.state.imageUrl} className={classes.image} alt=""></img>
-            <CloseIcon onClick={this.setPlaceholderImage} className={classes.close} visibility={this.state.imageUrl === '' ? 'hidden' : 'visible'}/>
-          </Box>
         </Container>
       </React.Fragment>
     );

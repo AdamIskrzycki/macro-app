@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import * as actionCreators from '../../store/actions';
 import { connect } from 'react-redux';
+import { halveMacros } from "../../utils";
 
 const useStyles = makeStyles(() => ({
   product: {
@@ -22,49 +23,48 @@ const useStyles = makeStyles(() => ({
     flexGrow: 1,
     textAlign: "center",
   },
-  regularPriceCrossed: {
-    fontSize: "26px",
-    fontWeight: "500",
-    textDecoration: "line-through",
-    color: "grey",
-  },
-  discountedPrice: {
-    fontSize: "26px",
-    color: 'salmon',
-    marginLeft: "30px",
-  },
-  regularPrice: {
-    fontSize: "26px",
+  productInfo: {
+    fontSize: "16px",
   },
   buyButton: {
-    marginLeft: "auto",
-    marginRight: "auto",
+    margin: '0 auto'
   },
 }));
 
 const Product = (props) => {
   const classes = useStyles();
 
+//   const productAddHalf = () => {
+
+//     let halvedProduct = {}
+//       for (let key in props.data) {
+//         console.log(key, props.data[key])
+//         if(typeof(props.data[key]) == 'number') {
+//           props.data[key] /= 2
+//         }
+//       }
+
+//       halvedProduct = props.data
+
+//     props.onAddHalf(halvedProduct)   
+
+//     // fix this so that it doesn't halve the properties indefinitely
+// }
+
   return (
     <Card className={classes.product}>
-      <CardMedia
-        className={classes.productMedia}
-        image={props.data.image ? props.data.image : "/images/nophoto.jpg"}
-        title={props.data.name}
-      />
+      {console.log('data', props.data)}
       <CardContent className={classes.productContent}>
         <Typography gutterBottom variant="h5" component="h2">
           {props.data.name}
         </Typography>
         <Typography>
-          {props.data.discountedPrice ? (
             <>
-              <span className={classes.regularPriceCrossed}>{"$" + props.data.price}</span>
-              <span className={classes.discountedPrice}>{"$" + props.data.discountedPrice}</span>
+              <p className={classes.productInfo}>{props.data.kcal + " kcal"}</p>
+              <p className={classes.productInfo}>{props.data.protein + "g protein"}</p>
+              <p className={classes.productInfo}>{props.data.carbs + "g carbs"}</p>
+              <p className={classes.productInfo}>{props.data.fat + "g fat"}</p>
             </>
-          ) : (
-            <span className={classes.regularPrice}>{"$" + props.data.price}</span>
-          )}
         </Typography>
       </CardContent>
       <CardActions>
@@ -76,8 +76,19 @@ const Product = (props) => {
           align="center"
           onClick={() => props.onAddProduct(props.data)}
         >
-          Buy
+          Add
         </Button>
+        {/* <Button
+          className={classes.buyButton}
+          variant="outlined"
+          size="medium"
+          color="primary"
+          align="center"
+          //onClick={() => props.onAddHalf(props.data)}
+          onClick={productAddHalf}
+        >
+          Add ½
+        </Button> */}
       </CardActions>
     </Card>
   );
@@ -85,7 +96,8 @@ const Product = (props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAddProduct: (product) => dispatch(actionCreators.add(product))
+    onAddProduct: (product) => dispatch(actionCreators.add(product)),
+    onAddHalf: (product) => dispatch(actionCreators.addHalf(product))
   }
 }
 
