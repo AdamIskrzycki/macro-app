@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { TextField, Button, Container, withStyles, Typography, Box } from "@material-ui/core";
 import { storage } from "../../firebase";
-import CloseIcon from '@material-ui/icons/Close';
-
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import CloseIcon from "@material-ui/icons/Close";
 
 const styles = (theme) => ({
   addButton: {
@@ -25,7 +25,7 @@ const styles = (theme) => ({
     marginTop: theme.spacing(6),
     "@media (max-width: 800px)": {
       width: "100%",
-    }
+    },
   },
   image: {
     maxWidth: "300px",
@@ -45,10 +45,10 @@ const styles = (theme) => ({
     textAlign: "center",
   },
   close: {
-    position: 'absolute',
-    marginTop: '20px',
-    cursor: 'pointer'
-  }
+    position: "absolute",
+    marginTop: "20px",
+    cursor: "pointer",
+  },
 });
 
 class AdminPanelControls extends Component {
@@ -70,6 +70,66 @@ class AdminPanelControls extends Component {
     this.setState({ [name]: value });
   };
 
+  setPlaceholderImage = () => {
+    this.setState({ imageUrl: "/images/nophoto.jpg" });
+  };
+
+  // handleImageAsFile = (e) => {
+  //   const file = e.target.files[0];
+  //   const storageRef = ref(storage, `/items/${file.name}`);
+  //   const uploadTask = uploadBytesResumable(storageRef, file);
+
+  //   if (file === undefined) return;
+
+  //   //const uploadTask = storage.ref(`/images/${file.name}`).put(file);
+
+  //   uploadTask.on(
+  //     "state_changed",
+  //     (snapShot) => {
+  //       console.log(snapShot);
+  //     },
+  //     (err) => {
+  //       console.log(err);
+  //     },
+  //     () => {
+  //       storage
+  //         .ref("images")
+  //         .child(file.name)
+  //         .getDownloadURL()
+  //         .then((fireBaseUrl) => {
+  //           console.log("imageUrl", this.state.imageUrl);
+  //           this.setState({ imageUrl: fireBaseUrl });
+  //         });
+  //     }
+  //   );
+  // };
+
+  handleImageAsFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return; // Ensure a file is selected
+
+    const storage = getStorage(); // Get Firebase Storage instance
+    const storageRef = ref(storage, `/macroapp-products/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      },
+      (error) => {
+        console.error("Upload failed:", error);
+      },
+      async () => {
+        // Upload completed, get the download URL
+        const fireBaseUrl = await getDownloadURL(uploadTask.snapshot.ref);
+        console.log("File available at", fireBaseUrl);
+        this.setState({ imageUrl: fireBaseUrl });
+      }
+    );
+};
+
   onButtonClick = () => {
     if (this.state.isInEditMode) {
       this.props.update(
@@ -78,16 +138,23 @@ class AdminPanelControls extends Component {
         this.state.kcal,
         this.state.protein,
         this.state.carbs,
-        this.state.fat
+        this.state.fat,
+        this.state.imageUrl
       );
     } else {
-      this.props.add(this.state.name, this.state.kcal, this.state.protein, this.state.carbs, this.state.fat);
+      this.props.add(
+        this.state.name,
+        this.state.kcal,
+        this.state.protein,
+        this.state.carbs,
+        this.state.fat,
+        this.state.imageUrl
+      );
     }
-    console.log("clearing")
-    this.setState({ name: "", kcal: "", protein: "", carbs: "" , fat: "", isInEditMode: false});
+    console.log("clearing");
+    this.setState({ name: "", kcal: "", protein: "", carbs: "", fat: "", imageUrl: "", isInEditMode: false });
     document.getElementById("focus").focus();
   };
-
 
   componentDidUpdate(prevProps) {
     if (prevProps.product !== this.props.product && this.props.product) {
@@ -105,7 +172,7 @@ class AdminPanelControls extends Component {
 
   // static componentDidUpdate(props, state) {
   //   if (
-  //     props.product && 
+  //     props.product &&
   //     (!state.isInEditMode || state.productId !== props.product.id)
   //   ) {
   //     return {
@@ -118,7 +185,7 @@ class AdminPanelControls extends Component {
   //       isInEditMode: true,
   //     };
   //   }
-    
+
   //   return null;
   // }
 
@@ -127,7 +194,7 @@ class AdminPanelControls extends Component {
     console.log(this.state);
 
     const inputProps = {
-      step: "1",
+      step: "0.1",
       min: "0",
     };
 
@@ -187,8 +254,21 @@ class AdminPanelControls extends Component {
             variant="outlined"
             className={classes.textField}
           />
-          <Button
-              disabled={this.state.name === "" || this.state.kcal === "" || this.state.protein === "" || this.state.carbs === "" || this.state.fat === ""}
+          <Box className={classes.box}>
+            <Typography variant="h6" color="textSecondary" className={classes.fileInput}>
+              <label for="imageUpload" className={classes.inputLabel}>
+                Add product image
+              </label>
+              <input id="imageUpload" type="file" onChange={this.handleImageAsFile} accept=".jpg, .jpeg, .png"></input>
+            </Typography>
+            <Button
+              disabled={
+                this.state.name === "" ||
+                this.state.kcal === "" ||
+                this.state.protein === "" ||
+                this.state.carbs === "" ||
+                this.state.fat === ""
+              }
               variant="contained"
               color="primary"
               className={classes.addButton}
@@ -196,6 +276,13 @@ class AdminPanelControls extends Component {
             >
               {this.state.isInEditMode ? "Save" : "Add"}
             </Button>
+            <img src={this.state.imageUrl} className={classes.image} alt=""></img>
+            <CloseIcon
+              onClick={this.setPlaceholderImage}
+              className={classes.close}
+              visibility={this.state.imageUrl === "" ? "hidden" : "visible"}
+            />
+          </Box>
         </Container>
       </React.Fragment>
     );

@@ -9,16 +9,18 @@ class AdminPanel extends Component {
   state = {
     products: null,
     product: undefined,
+    productImageToKeep: ""
   };
 
-  addNewProduct = async (name, kcal, protein, carbs, fat) => {
+  addNewProduct = async (name, kcal, protein, carbs, fat, image) => {
     try {
       await addDoc(collection(db, "products"), {
         name: name,
         kcal: +kcal,
         protein: +protein,
         carbs: +carbs,
-        fat: +fat
+        fat: +fat,
+        image: image
       });
       this.getProducts();
     } catch (error) {
@@ -51,9 +53,10 @@ class AdminPanel extends Component {
 
   editProduct = (product) => {
     this.setState({ product });
+    this.setState({productImageToKeep: product.image})
   };
 
-  updateProduct = async (id, name, kcal, protein, carbs, fat) => {
+  updateProduct = async (id, name, kcal, protein, carbs, fat, image) => {
     try {
       const updatedProduct = {
         name: name,
@@ -62,6 +65,12 @@ class AdminPanel extends Component {
         carbs: +carbs,
         fat: +fat
       };
+
+      if (image !== "" && image !== this.state.productImageToKeep) {
+        updatedProduct.image = image;
+      } else {
+        updatedProduct.image = this.state.productImageToKeep;
+      }
 
       await setDoc(doc(db, "products", id), updatedProduct);
       this.getProducts();
@@ -90,7 +99,8 @@ class AdminPanel extends Component {
             <AdminPanelControls 
               add={this.addNewProduct} 
               update={this.updateProduct} 
-              product={this.state.product} 
+              product={this.state.product}
+              productImageToKeep={this.productImageToKeep}
             />
           </div>
         </div>
@@ -100,6 +110,3 @@ class AdminPanel extends Component {
 }
 
 export default AdminPanel;
-
-
-// fix so that admin panel controls clear inputs after updating a product

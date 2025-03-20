@@ -53,7 +53,11 @@ const Product = (props) => {
 
   return (
     <Card className={classes.product}>
-      {console.log('data', props.data)}
+      <CardMedia
+        className={classes.productMedia}
+        image={props.data.image ? props.data.image : "/images/nophoto.jpg"}
+        title={props.data.name}
+      />
       <CardContent className={classes.productContent}>
         <Typography gutterBottom variant="h5" component="h2">
           {props.data.name}

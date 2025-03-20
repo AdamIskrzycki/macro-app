@@ -8,6 +8,8 @@ const firebaseConfig = {
   //authDomain: "sklep-inz.firebaseapp.com",
   databaseURL: "https://macro-app-73387.firebaseio.com",
   projectId: "macro-app-73387",
+  storageBucket: "sklep-inz.appspot.com",
+  // using storage from sklep-inz because its no longer free to create new storages
 };
 
 const app = initializeApp(firebaseConfig);

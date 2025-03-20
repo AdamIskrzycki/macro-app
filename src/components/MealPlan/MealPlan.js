@@ -95,10 +95,10 @@ class MealPlan extends Component {
         </List>
         <Typography variant="h5" className={classes.totalPrice}>
           Today's total macros: <br></br>
-          {totalKcal + " kcal"}<br></br>
-          {totalProtein + " g protein"}<br></br>
-          {totalCarbs + " g carbs"}<br></br>
-          {totalFat + " g fat"}
+          {totalKcal.toFixed(1) + " kcal"}<br></br>
+          {totalProtein.toFixed(1) + " g protein"}<br></br>
+          {totalCarbs.toFixed(1) + " g carbs"}<br></br>
+          {totalFat.toFixed(1) + " g fat"}
         </Typography>
         <Typography variant="h5" className={classes.totalAmount}>
           {this.props.products ? "Products in a meal plan: " + this.props.products.length : "Your meal plan is empty"}

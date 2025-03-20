@@ -26,7 +26,7 @@ const styles = (theme) => ({
   },
   productsContainer: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
     // "@media (max-width: 1200px)": {
       flexWrap: "wrap",

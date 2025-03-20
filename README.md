@@ -1,7 +1,7 @@
 # About project
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-The app imitates an online shop. You can add your own products via the admin panel and then head to the "shop" section to buy them.
+The app lets you add your own products via the admin panel and add them to your meal plan to track your calories and macros.
 You can also create your own account and sign in with it.
 
 **This project uses Firebase authentication, Firebase database and Firebase storage**
@@ -18,4 +18,4 @@ Used libraries:
 * [Firebase](https://firebase.google.com/)
 
 # Hosting
-This app is hosted on [Firebase Hosting](https://firebase.google.com/docs/hosting).
+This app is hosted on [Github Pages](https://pages.github.com/).
