@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/macro-app/static/css/main.274fcf37.css",
+    "main.js": "/macro-app/static/js/main.62d6e060.js",
+    "index.html": "/macro-app/index.html",
+    "main.274fcf37.css.map": "/macro-app/static/css/main.274fcf37.css.map",
+    "main.62d6e060.js.map": "/macro-app/static/js/main.62d6e060.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.274fcf37.css",
+    "static/js/main.62d6e060.js"
+  ]
+}
