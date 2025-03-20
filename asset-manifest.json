@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/macro-app/static/css/main.274fcf37.css",
-    "main.js": "/macro-app/static/js/main.62d6e060.js",
+    "main.js": "/macro-app/static/js/main.5a0d2376.js",
     "index.html": "/macro-app/index.html",
     "main.274fcf37.css.map": "/macro-app/static/css/main.274fcf37.css.map",
-    "main.62d6e060.js.map": "/macro-app/static/js/main.62d6e060.js.map"
+    "main.5a0d2376.js.map": "/macro-app/static/js/main.5a0d2376.js.map"
   },
   "entrypoints": [
     "static/css/main.274fcf37.css",
-    "static/js/main.62d6e060.js"
+    "static/js/main.5a0d2376.js"
   ]
 }
