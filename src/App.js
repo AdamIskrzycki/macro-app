@@ -39,7 +39,7 @@ class App extends Component {
     }
 
     return (
-      <BrowserRouter>
+      <BrowserRouter basename="/macro-app">
         <CssBaseline />
         <Header />
         <main>{routes}</main>
